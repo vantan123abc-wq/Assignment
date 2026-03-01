@@ -31,6 +31,14 @@ public class CheckoutController extends HttpServlet {
             response.sendRedirect("login");
             return;
         }
+        String action = request.getParameter("action");
+if ("success".equals(action)) {
+    String orderId = request.getParameter("orderId");
+    request.setAttribute("orderId", orderId);
+
+    request.getRequestDispatcher("order-success.jsp").forward(request, response);
+    return;
+}
 
         CartDao cartDao = new CartDao();
         model.Cart cart = cartDao.getCartByAccountId(account.getId());
@@ -121,12 +129,16 @@ public class CheckoutController extends HttpServlet {
             boolean success = orderDao.createOrder(order, cartItems, payment);
 
             if (success) {
-                cartDao.clearCart(account.getId());
-                response.sendRedirect("order-success.jsp");
-            } else {
-                request.setAttribute("error", "Đặt hàng thất bại! Vui lòng thử lại.");
-                doGet(request, response);
-            }
+    cartDao.clearCart(account.getId());
+
+    // ĐỔI redirect về servlet (không redirect .jsp nữa)
+    response.sendRedirect(request.getContextPath() + "/checkout?action=success&orderId=" + order.getId());
+    return;
+} else {
+    request.setAttribute("error", "Đặt hàng thất bại! Vui lòng thử lại.");
+    doGet(request, response);
+    return;
+}
         }
     }
 }

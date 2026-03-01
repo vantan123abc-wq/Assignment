@@ -45,7 +45,7 @@ public class OrderDao {
 
             // 2. Insert into OrderItems and 3. Update Product stock
             String sqlOrderItem = "INSERT INTO OrderItems (order_id, product_id, price, quantity) VALUES (?, ?, ?, ?)";
-            String sqlUpdateStock = "UPDATE Product SET stock = stock - ? WHERE id = ?";
+            String sqlUpdateStock = "UPDATE Product SET stock = stock - ? WHERE id = ? AND stock >= ?";
 
             try (PreparedStatement psOrderItem = conn.prepareStatement(sqlOrderItem);
                     PreparedStatement psUpdateStock = conn.prepareStatement(sqlUpdateStock)) {
@@ -61,10 +61,17 @@ public class OrderDao {
                     // Update stock
                     psUpdateStock.setInt(1, item.getQuantity()); // reduce by quantity
                     psUpdateStock.setInt(2, item.getProduct().getId());
+                    psUpdateStock.setInt(3, item.getQuantity()); // stock >= quantity (THÊM DÒNG NÀY)
                     psUpdateStock.addBatch();
                 }
                 psOrderItem.executeBatch();
-                psUpdateStock.executeBatch();
+
+                int[] stockResults = psUpdateStock.executeBatch();
+                for (int r : stockResults) {
+                    if (r == 0) {
+                        throw new Exception("Không đủ tồn kho cho một sản phẩm trong giỏ.");
+                    }
+                }
             }
 
             // 4. Insert into Payment
@@ -84,6 +91,58 @@ public class OrderDao {
             if (conn != null) {
                 try {
                     conn.rollback(); // Rollback on error
+                } catch (Exception ex) {
+                    ex.printStackTrace();
+                }
+            }
+            return false;
+        } finally {
+            if (conn != null) {
+                try {
+                    conn.setAutoCommit(true);
+                    conn.close();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+    }
+
+    public boolean markPaid(int orderId, String method) {
+        Connection conn = null;
+        try {
+            conn = DBConnection.getConnection();
+            if (conn == null)
+                return false;
+
+            conn.setAutoCommit(false); // Start transaction
+
+            // 1. Update Payment status
+            String updatePayment = "UPDATE Payment SET status = 'PAID', method = ? WHERE order_id = ?";
+            try (PreparedStatement psPayment = conn.prepareStatement(updatePayment)) {
+                psPayment.setString(1, method);
+                psPayment.setInt(2, orderId);
+                int rowsPayment = psPayment.executeUpdate();
+                if (rowsPayment == 0)
+                    throw new Exception("Updating payment failed, no rows affected.");
+            }
+
+            // 2. Update Orders status
+            String updateOrder = "UPDATE Orders SET status = 'CONFIRMED' WHERE id = ?";
+            try (PreparedStatement psOrder = conn.prepareStatement(updateOrder)) {
+                psOrder.setInt(1, orderId);
+                int rowsOrder = psOrder.executeUpdate();
+                if (rowsOrder == 0)
+                    throw new Exception("Updating order failed, no rows affected.");
+            }
+
+            conn.commit();
+            return true;
+        } catch (Exception e) {
+            e.printStackTrace();
+            if (conn != null) {
+                try {
+                    conn.rollback();
                 } catch (Exception ex) {
                     ex.printStackTrace();
                 }

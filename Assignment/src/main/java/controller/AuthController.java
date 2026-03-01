@@ -104,6 +104,16 @@ public class AuthController extends HttpServlet {
         if (acc != null && BCrypt.checkpw(password, acc.getPasswordHash())) {
             HttpSession session = request.getSession();
             session.setAttribute("account", acc);
+
+            // Fetch and set cart count to session so that the badge shows correct number
+            // immediately after login
+            dao.CartDao cartDao = new dao.CartDao();
+            model.Cart cart = cartDao.getCartByAccountId(acc.getId());
+            if (cart != null) {
+                int totalItems = cartDao.getTotalItemsCount(cart.getId());
+                session.setAttribute("cartCount", totalItems);
+            }
+
             String remember = request.getParameter("remember");
             if (remember != null) {
                 Cookie c = new Cookie("USERNAME_COOKIE", username);
@@ -116,7 +126,7 @@ public class AuthController extends HttpServlet {
                 response.addCookie(c);
             }
 
-            response.sendRedirect("index.jsp");
+            response.sendRedirect(request.getContextPath() + "/index");
         } else {
             request.setAttribute("error", "Username or password is wrong, try again!");
             request.getRequestDispatcher("login.jsp").forward(request, response);

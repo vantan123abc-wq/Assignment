@@ -121,6 +121,7 @@ public class CartDao {
                     }
                 }
             }
+
         } catch (SQLException e) {
             e.printStackTrace();
         }

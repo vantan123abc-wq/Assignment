@@ -48,14 +48,14 @@ public class CartController extends HttpServlet {
                 int newQuantity = Integer.parseInt(request.getParameter("quantity"));
                 cartDao.updateItemQuantity(cartItemId, newQuantity);
                 updateCartCount(request, cart.getId());
-                response.sendRedirect("cart.jsp");
+                response.sendRedirect(request.getContextPath() + "/cart");
                 break;
 
             case "remove":
                 int removeId = Integer.parseInt(request.getParameter("itemId"));
                 cartDao.removeItem(removeId);
                 updateCartCount(request, cart.getId());
-                response.sendRedirect("cart.jsp");
+                response.sendRedirect(request.getContextPath() + "/cart");
                 break;
 
             case "view":
@@ -63,7 +63,7 @@ public class CartController extends HttpServlet {
                 updateCartCount(request, cart.getId());
                 java.util.List<model.CartItem> cartItems = cartDao.getItemsByCartId(cart.getId());
                 request.setAttribute("cartItems", cartItems);
-                request.getRequestDispatcher("cart.jsp").forward(request, response);
+                request.getRequestDispatcher("/cart.jsp").forward(request, response);
                 break;
         }
     }

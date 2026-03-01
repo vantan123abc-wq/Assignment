@@ -6,7 +6,7 @@ import model.ChatMessage;
 
 public class PromptBuilder {
 
-    private static final String SYSTEM_INSTRUCTION = "Bạn là một nhân viên tư vấn bán hàng chuyên nghiệp cho cửa hàng điện tử. "
+    private static final String SYSTEM_INSTRUCTION = "Bạn là một nhân viên tư vấn bán hàng chuyên nghiệp cho cửa hàng Nông Sản Việt. "
             +
             "Chỉ tư vấn dựa trên danh sách sản phẩm hiện có của cửa hàng. " +
             "Không tự bịa ra giá bán, không bịa ra sản phẩm không có thực. " +

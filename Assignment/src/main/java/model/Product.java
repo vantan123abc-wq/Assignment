@@ -2,10 +2,12 @@ package model;
 
 public class Product {
     private int id;
+    private int categoryId;
     private String name;
     private double price;
     private int quantity;
     private String description;
+    private Integer discountPercent;
 
     public Product() {
     }
@@ -24,6 +26,14 @@ public class Product {
 
     public void setId(int id) {
         this.id = id;
+    }
+
+    public int getCategoryId() {
+        return categoryId;
+    }
+
+    public void setCategoryId(int categoryId) {
+        this.categoryId = categoryId;
     }
 
     public String getName() {
@@ -58,14 +68,31 @@ public class Product {
         this.description = description;
     }
 
+    public Integer getDiscountPercent() {
+        return discountPercent;
+    }
+
+    public void setDiscountPercent(Integer discountPercent) {
+        this.discountPercent = discountPercent;
+    }
+
+    public double getSalePrice() {
+        if (discountPercent == null || discountPercent <= 0) {
+            return price;
+        }
+        return price * (100 - discountPercent) / 100.0;
+    }
+
     @Override
     public String toString() {
         return "Product{" +
                 "id=" + id +
+                ", categoryId=" + categoryId +
                 ", name='" + name + '\'' +
                 ", price=" + price +
                 ", quantity=" + quantity +
                 ", description='" + description + '\'' +
+                ", discountPercent=" + discountPercent +
                 '}';
     }
 }

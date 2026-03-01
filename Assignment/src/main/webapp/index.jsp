@@ -72,8 +72,10 @@
                             <!-- Desktop Nav Links -->
                             <nav class="hidden md:flex items-center gap-8">
                                 <a class="font-medium text-primary border-b-2 border-primary" href="#">Trang chủ</a>
-                                <a class="font-medium hover:text-primary transition-colors" href="#">Sản phẩm</a>
-                                <a class="font-medium hover:text-primary transition-colors" href="#">Khuyến mãi</a>
+                                <a class="font-medium hover:text-primary transition-colors"
+                                    href="${pageContext.request.contextPath}/shop">Sản phẩm</a>
+                                <a class="font-medium hover:text-primary transition-colors"
+                                    href="${pageContext.request.contextPath}/promotions">Khuyến mãi</a>
                                 <a class="font-medium hover:text-primary transition-colors" href="#">Về chúng tôi</a>
                             </nav>
 
@@ -93,12 +95,17 @@
                                         <span class="material-symbols-outlined">favorite</span>
                                     </button>
 
-                                    <a href="cart.jsp" onclick="window.location.href='cart.jsp'; return false;"
-                                        style="cursor: pointer;"
+                                    <a href="${pageContext.request.contextPath}/cart"
                                         class="relative z-50 p-2.5 flex items-center justify-center rounded-full hover:bg-primary/10 text-slate-600 dark:text-slate-300">
+
                                         <span class="material-symbols-outlined">shopping_cart</span>
-                                        <span
-                                            class="absolute top-1 right-1 bg-primary text-white text-[10px] font-bold px-1.5 py-0.5 rounded-full z-50 pointer-events-none">3</span>
+
+                                        <c:if test="${sessionScope.cartCount > 0}">
+                                            <span
+                                                class="absolute top-1 right-1 bg-primary text-white text-[10px] font-bold px-1.5 py-0.5 rounded-full z-50 pointer-events-none">
+                                                ${sessionScope.cartCount}
+                                            </span>
+                                        </c:if>
                                     </a>
 
                                     <c:choose>
@@ -134,7 +141,8 @@
                 <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-12">
 
                     <!-- Hero Section -->
-                    <section class="relative h-[500px] rounded-3xl overflow-hidden shadow-2xl">
+                    <section
+                        class="relative min-h-[500px] rounded-3xl overflow-hidden shadow-2xl flex flex-col justify-center py-16">
                         <div class="absolute inset-0 bg-cover bg-center"
                             data-alt="Fresh vegetable market landscape background"
                             style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuCVj1hLs9-DlBz3V8-O9Eo6EBRa0EUN9pebGEBBHNKWSReYxVLOFXd6o2lDm-YqsehrI4U_Lr-q8yjSKmERLPUxgXPUVu8zRLg9xho7x2Ijq2T1TCIb4jLhLeBDAE8JCd9y-KBzC4ngFIWvFSaB5csLafcNLvHNTxSRXezigBlkzhitblKHwLn0qW1vlS8TBsfihxMshKwvxA3eo0Wc65HGOlNGUp1wWO72eLIW8YnHCpoeVGMQKPuoft0RkPDW63QVvgl3gW_kkXaU');">
@@ -142,7 +150,7 @@
 
                         <div class="absolute inset-0 bg-gradient-to-r from-black/70 via-black/40 to-transparent"></div>
 
-                        <div class="relative h-full flex flex-col justify-center items-start px-12 lg:px-20 max-w-2xl">
+                        <div class="relative flex flex-col justify-center items-start px-12 lg:px-20 max-w-2xl">
                             <span
                                 class="bg-primary/20 text-primary border border-primary/30 px-4 py-1.5 rounded-full text-sm font-bold mb-6 backdrop-blur-sm">
                                 Sạch từ Nông Trại - Tươi tới Bàn Ăn
@@ -176,7 +184,7 @@
                     <section>
                         <div class="flex items-center justify-between mb-8">
                             <h3 class="text-2xl font-bold">Danh mục sản phẩm</h3>
-                            <a class="text-primary font-semibold flex items-center gap-1 hover:underline" href="#">
+                            <a class="text-primary font-semibold flex items-center gap-1 hover:underline" href="shop">
                                 Xem tất cả <span class="material-symbols-outlined text-sm">arrow_forward</span>
                             </a>
                         </div>
@@ -184,7 +192,7 @@
                         <div class="grid grid-cols-2 md:grid-cols-4 gap-6">
 
                             <!-- Cat 1 -->
-                            <div class="group cursor-pointer">
+                            <a href="shop?catId=1" class="group cursor-pointer block">
                                 <div class="relative h-48 rounded-2xl overflow-hidden mb-3">
                                     <img class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
                                         data-alt="Fresh organic green vegetables"
@@ -194,10 +202,10 @@
                                         <span class="text-white font-bold text-lg">Rau Xanh Tươi</span>
                                     </div>
                                 </div>
-                            </div>
+                            </a>
 
                             <!-- Cat 2 -->
-                            <div class="group cursor-pointer">
+                            <a href="shop?catId=2" class="group cursor-pointer block">
                                 <div class="relative h-48 rounded-2xl overflow-hidden mb-3">
                                     <img class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
                                         data-alt="Selection of tropical and seasonal fruits"
@@ -207,10 +215,10 @@
                                         <span class="text-white font-bold text-lg">Trái Cây Mùa Vụ</span>
                                     </div>
                                 </div>
-                            </div>
+                            </a>
 
                             <!-- Cat 3 -->
-                            <div class="group cursor-pointer">
+                            <a href="shop?catId=3" class="group cursor-pointer block">
                                 <div class="relative h-48 rounded-2xl overflow-hidden mb-3">
                                     <img class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
                                         data-alt="Fresh cuts of raw meat"
@@ -220,10 +228,10 @@
                                         <span class="text-white font-bold text-lg">Thịt &amp; Hải Sản</span>
                                     </div>
                                 </div>
-                            </div>
+                            </a>
 
                             <!-- Cat 4 -->
-                            <div class="group cursor-pointer">
+                            <a href="shop?catId=4" class="group cursor-pointer block">
                                 <div class="relative h-48 rounded-2xl overflow-hidden mb-3">
                                     <img class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
                                         data-alt="Assorted dry goods and grains"
@@ -233,7 +241,7 @@
                                         <span class="text-white font-bold text-lg">Đồ Khô &amp; Gia Vị</span>
                                     </div>
                                 </div>
-                            </div>
+                            </a>
 
                         </div>
                     </section>
@@ -260,10 +268,18 @@
 
                         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
 
-                            <c:forEach items="${products}" var="p">
+                            <c:forEach items="${bestSellers}" var="p">
                                 <!-- Product Card -->
                                 <div
-                                    class="bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 rounded-2xl p-4 group transition-shadow hover:shadow-xl flex flex-col justify-between">
+                                    class="bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 rounded-2xl p-4 group transition-shadow hover:shadow-xl flex flex-col justify-between relative overflow-hidden">
+
+                                    <c:if test="${p.discountPercent != null && p.discountPercent > 0}">
+                                        <div
+                                            class="absolute top-6 left-6 z-10 bg-red-600 text-white font-black text-xs px-2 py-1 rounded-md shadow-sm">
+                                            -${p.discountPercent}%
+                                        </div>
+                                    </c:if>
+
                                     <div>
                                         <div
                                             class="relative aspect-square rounded-xl overflow-hidden mb-4 bg-slate-50 dark:bg-slate-800 flex items-center justify-center">
@@ -282,29 +298,42 @@
                                         </div>
 
                                         <div class="space-y-1">
-                                            <span class="text-xs text-primary font-bold uppercase">Sản phẩm</span>
+                                            <span class="text-xs text-primary font-bold uppercase">Sản phẩm bán
+                                                chạy</span>
                                             <h4 class="font-bold text-lg leading-tight line-clamp-2" title="${p.name}">
                                                 ${p.name}</h4>
-                                            <p class="text-xs text-slate-500 line-clamp-2" title="${p.description}">
-                                                ${p.description}</p>
+                                            <p class="text-xs text-slate-500">Đã bán: ${p.soldQty}</p>
                                         </div>
                                     </div>
-
                                     <div class="mt-4 flex items-center justify-between">
                                         <div class="flex flex-col">
-                                            <span class="text-primary font-black text-xl whitespace-nowrap">
-                                                <fmt:formatNumber value="${p.price}" type="number"
-                                                    groupingUsed="true" />₫
-                                            </span>
-                                            <span class="text-xs text-slate-400">Tồn kho: ${p.quantity}</span>
+                                            <c:choose>
+                                                <c:when test="${p.discountPercent != null && p.discountPercent > 0}">
+                                                    <div class="flex items-end gap-2">
+                                                        <span class="text-red-500 font-black text-xl whitespace-nowrap">
+                                                            <fmt:formatNumber value="${p.salePrice}" type="number"
+                                                                groupingUsed="true" />₫
+                                                        </span>
+                                                        <span class="text-xs text-slate-400 line-through mb-1">
+                                                            <fmt:formatNumber value="${p.price}" type="number"
+                                                                groupingUsed="true" />₫
+                                                        </span>
+                                                    </div>
+                                                </c:when>
+                                                <c:otherwise>
+                                                    <span class="text-primary font-black text-xl whitespace-nowrap">
+                                                        <fmt:formatNumber value="${p.price}" type="number"
+                                                            groupingUsed="true" />₫
+                                                    </span>
+                                                </c:otherwise>
+                                            </c:choose>
                                         </div>
-
                                         <form action="cart" method="post" class="m-0">
                                             <input type="hidden" name="action" value="add">
                                             <input type="hidden" name="productId" value="${p.id}">
                                             <button type="submit"
-                                                class="bg-primary text-white size-10 rounded-xl flex items-center justify-center shadow-lg shadow-primary/30 transition-transform active:scale-90 border-0 cursor-pointer hover:bg-primary/90">
-                                                <span class="material-symbols-outlined">add</span>
+                                                class="bg-primary text-white px-3 py-2 rounded-xl flex items-center justify-center shadow-lg shadow-primary/30 transition-transform active:scale-90 border-0 cursor-pointer hover:bg-primary/90">
+                                                <span class="text-sm font-bold">Thêm vào giỏ</span>
                                             </button>
                                         </form>
                                     </div>
