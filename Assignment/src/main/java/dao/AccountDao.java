@@ -66,7 +66,7 @@ public class AccountDao {
         EntityTransaction tx = em.getTransaction();
         try {
             tx.begin();
-            em.createQuery("UPDATE Account a SET a.passwordHash = :p WHERE a.email = :e")
+            em.createQuery("UPDATE Account a SET a.password = :p WHERE a.email = :e")
                     .setParameter("p", newPasswordHash)
                     .setParameter("e", email)
                     .executeUpdate();

@@ -36,7 +36,7 @@ public class AuthFilter implements Filter {
 
         // Clean Bypass for public paths
         // Cho phép anonymous dùng chat (vì khách chưa đăng nhập) và các trang công khai
-        // khác
+       
         if (uri.endsWith("/chat") ||
                 uri.endsWith("/index_1.jsp") ||
                 uri.endsWith("/index.jsp") ||
