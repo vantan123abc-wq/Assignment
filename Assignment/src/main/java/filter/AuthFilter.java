@@ -1,16 +1,8 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/JSP_Servlet/Filter.java to edit this template
- */
 package filter;
 
 import java.io.IOException;
-import java.io.PrintStream;
-import java.io.PrintWriter;
-import java.io.StringWriter;
 import jakarta.servlet.Filter;
 import jakarta.servlet.FilterChain;
-import jakarta.servlet.FilterConfig;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.ServletRequest;
 import jakarta.servlet.ServletResponse;
@@ -18,14 +10,12 @@ import jakarta.servlet.annotation.WebFilter;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
+import model.Account; // BẮT BUỘC PHẢI THÊM IMPORT NÀY
 
-/**
- *
- * @author DELL
- */
 @WebFilter(filterName = "AuthFilter", urlPatterns = { "/*" })
 public class AuthFilter implements Filter {
 
+    @Override
     public void doFilter(ServletRequest request, ServletResponse response,
             FilterChain chain)
             throws IOException, ServletException {
@@ -34,12 +24,11 @@ public class AuthFilter implements Filter {
 
         String uri = req.getRequestURI();
 
-        // Clean Bypass for public paths
-        // Cho phép anonymous dùng chat (vì khách chưa đăng nhập) và các trang công khai
-       
+        // 1. Cho phép truy cập công khai không cần đăng nhập
         if (uri.endsWith("/chat") ||
                 uri.endsWith("/index_1.jsp") ||
                 uri.endsWith("/index.jsp") ||
+                uri.equals(req.getContextPath() + "/") || // Chừa đường dẫn gốc
                 uri.endsWith("/login.jsp") ||
                 uri.endsWith("/login") ||
                 uri.endsWith("/register.jsp") ||
@@ -54,13 +43,29 @@ public class AuthFilter implements Filter {
             return;
         }
 
+        // 2. Kiểm tra ĐĂNG NHẬP
         HttpSession session = req.getSession(false);
         if (session == null || session.getAttribute("account") == null) {
-            req.setAttribute("error", "Vui l\u00f2ng \u0111\u0103ng nh\u1eadp tr\u01b0\u1edbc khi xem!");
+            req.setAttribute("error", "Vui lòng đăng nhập trước khi xem!");
             req.getRequestDispatcher("login.jsp").forward(req, res);
             return;
         }
-        chain.doFilter(request, response);
 
+        // 3. PHÂN QUYỀN (AUTHORIZATION) - Bảo vệ trang admin
+        if (uri.contains("demo.jsp") || uri.contains("/admin")) {
+            Account acc = (Account) session.getAttribute("account");
+            String role = acc.getRole();
+            
+            System.out.println("=== FILTER CHECK: Người dùng truy cập trang Admin có role là: " + role + " ===");
+            
+            if (role == null || !role.trim().equalsIgnoreCase("ADMIN")) {
+                System.out.println("=== FILTER CHẶN: Không phải Admin, đẩy về trang chủ! ===");
+                res.sendRedirect(req.getContextPath() + "/index.jsp");
+                return;
+            }
+        }
+
+        // Hợp lệ, cho phép đi tiếp đến file JSP/Servlet
+        chain.doFilter(request, response);
     }
 }

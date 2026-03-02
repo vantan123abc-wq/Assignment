@@ -25,19 +25,26 @@ import jakarta.servlet.http.HttpServletResponse;
 @WebFilter(filterName = "BlockJspFilter", urlPatterns = { "/*" })
 public class BlockJspFilter implements Filter {
 
+    @Override
     public void doFilter(ServletRequest request, ServletResponse response,
             FilterChain chain)
             throws IOException, ServletException {
         HttpServletRequest req = (HttpServletRequest) request;
         HttpServletResponse res = (HttpServletResponse) response;
         String uri = req.getRequestURI();
-        if (uri != null && uri.endsWith(".jsp") && !uri.endsWith("/index.jsp") && !uri.endsWith("/index_1.jsp")
-                && !uri.endsWith("/watch.jsp")) {
+        
+        // Thêm điều kiện !uri.endsWith("/admin.jsp") vào đây
+        if (uri != null && uri.endsWith(".jsp") 
+                && !uri.endsWith("/index.jsp") 
+                && !uri.endsWith("/index_1.jsp")
+                && !uri.endsWith("/watch.jsp")
+                && !uri.endsWith("/admin.jsp") 
+                && !uri.endsWith("/dashboard.jsp")) { // Thêm cả dashboard.jsp nếu bạn đang dùng nó để test
+            
             res.sendRedirect(req.getContextPath() + "/index.jsp");
             return;
         }
         chain.doFilter(request, response);
-
     }
 
     /**
