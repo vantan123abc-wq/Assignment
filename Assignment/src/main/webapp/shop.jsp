@@ -83,13 +83,19 @@
 
                             <!-- Search & Actions -->
                             <div class="flex items-center gap-4 flex-1 max-w-md ml-8">
-                                <div class="relative w-full">
+                                <form action="${pageContext.request.contextPath}/shop" method="GET"
+                                    class="relative w-full group">
                                     <span
                                         class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-slate-400">search</span>
-                                    <input
+                                    <input id="searchInput" name="keyword" value="${keyword}"
                                         class="w-full bg-slate-100 dark:bg-slate-800 border-none rounded-full py-2.5 pl-10 pr-4 focus:ring-2 focus:ring-primary/50 text-sm"
-                                        placeholder="Tìm kiếm nông sản..." type="text" />
-                                </div>
+                                        placeholder="Tìm kiếm nông sản..." type="text" autocomplete="off" />
+                                    <!-- Search Suggestions Dropdown -->
+                                    <div id="searchResults"
+                                        class="absolute top-full left-0 right-0 mt-2 bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 rounded-2xl shadow-2xl overflow-hidden z-[100] hidden flex-col max-h-96 overflow-y-auto">
+                                        <!-- results injected via js -->
+                                    </div>
+                                </form>
 
                                 <div class="flex items-center gap-2">
                                     <button
@@ -357,6 +363,63 @@
 
                 <!-- Chat Widget AI -->
                 <jsp:include page="WEB-INF/views/chat-widget.jsp" />
+
+                <!-- Search Autocomplete Script -->
+                <script>
+                    const searchInput = document.getElementById('searchInput');
+                    const searchResults = document.getElementById('searchResults');
+                    let debounceTimer;
+
+                    searchInput.addEventListener('input', function () {
+                        clearTimeout(debounceTimer);
+                        const keyword = this.value.trim();
+
+                        if (keyword.length === 0) {
+                            searchResults.classList.add('hidden');
+                            searchResults.innerHTML = '';
+                            return;
+                        }
+
+                        debounceTimer = setTimeout(() => {
+                            fetch(`${pageContext.request.contextPath}/api/search?q=` + encodeURIComponent(keyword))
+                                .then(response => response.json())
+                                .then(data => {
+                                    if (data.length === 0) {
+                                        searchResults.innerHTML = '<div class="p-4 text-center text-sm text-slate-500">Không tìm thấy sản phẩm nào.</div>';
+                                    } else {
+                                        searchResults.innerHTML = data.map(item => `
+                                            <a href="${pageContext.request.contextPath}/shop?keyword=` + encodeURIComponent(item.name) + `" class="flex items-center gap-3 p-3 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors border-b border-slate-50 last:border-0 dark:border-slate-800">
+                                                <div class="size-12 rounded-lg bg-cover bg-center shrink-0" style="background-image: url('\${item.imageUrl || item.description.startsWith('http') ? item.description : ''}')">
+                                                    \${(!item.imageUrl && !item.description.startsWith('http')) ? '<span class="material-symbols-outlined text-slate-300 w-full h-full flex items-center justify-center">inventory_2</span>' : ''}
+                                                </div>
+                                                <div class="flex-1 min-w-0">
+                                                    <h4 class="text-sm font-bold text-slate-900 dark:text-white truncate">\${item.name}</h4>
+                                                    <p class="text-xs font-semibold text-primary">\${new Intl.NumberFormat('vi-VN').format(item.price)}₫</p>
+                                                </div>
+                                            </a>
+                                        `).join('');
+                                    }
+                                    searchResults.classList.remove('hidden');
+                                    searchResults.classList.add('flex');
+                                })
+                                .catch(err => console.error('Search error:', err));
+                        }, 300); // 300ms debounce
+                    });
+
+                    // Hide dropdown when clicking outside
+                    document.addEventListener('click', (e) => {
+                        if (!searchInput.contains(e.target) && !searchResults.contains(e.target)) {
+                            searchResults.classList.add('hidden');
+                        }
+                    });
+
+                    // Show dropdown when focusing back on input if there is text
+                    searchInput.addEventListener('focus', () => {
+                        if (searchInput.value.trim().length > 0 && searchResults.innerHTML !== '') {
+                            searchResults.classList.remove('hidden');
+                        }
+                    });
+                </script>
             </body>
 
             </html>

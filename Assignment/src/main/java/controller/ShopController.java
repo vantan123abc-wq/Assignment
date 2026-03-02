@@ -19,6 +19,7 @@ public class ShopController extends HttpServlet {
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         String catIdParam = request.getParameter("catId");
+        String keyword = request.getParameter("keyword");
 
         CategoryDao catDao = new CategoryDao();
         ProductDao prodDao = new ProductDao();
@@ -26,7 +27,10 @@ public class ShopController extends HttpServlet {
         List<Category> categories = catDao.findAll();
         List<Product> products;
 
-        if (catIdParam != null && !catIdParam.trim().isEmpty()) {
+        if (keyword != null && !keyword.trim().isEmpty()) {
+            products = prodDao.searchProducts(keyword, 100);
+            request.setAttribute("keyword", keyword);
+        } else if (catIdParam != null && !catIdParam.trim().isEmpty()) {
             try {
                 int catId = Integer.parseInt(catIdParam);
                 products = prodDao.findAvailableByCategory(catId);

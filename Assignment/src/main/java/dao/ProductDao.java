@@ -1,5 +1,9 @@
 package dao;
 
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 import model.Product;
@@ -188,5 +192,33 @@ public class ProductDao {
                                         .append("\n  Mô tả: ").append(p.getDescription()).append("\n\n");
                 }
                 return sb.toString();
+        }
+
+        public List<Product> searchProducts(String keyword, int limit) {
+                List<Product> products = new ArrayList<>();
+                String query = "SELECT top " + limit
+                                + " * FROM Product WHERE name LIKE ? AND stock > 0 ORDER BY id DESC";
+
+                try {
+                        Connection conn = DBConnection.getConnection();
+                        PreparedStatement ps = conn.prepareStatement(query);
+                        ps.setString(1, "%" + keyword + "%");
+                        ResultSet rs = ps.executeQuery();
+                        while (rs.next()) {
+                                Product p = new Product();
+                                p.setId(rs.getInt("id"));
+                                p.setCategoryId(rs.getInt("category_id"));
+                                p.setName(rs.getString("name"));
+                                p.setPrice(rs.getDouble("price"));
+                                p.setQuantity(rs.getInt("stock"));
+                                p.setDescription(rs.getString("description"));
+                                p.setDiscountPercent((Integer) rs.getObject("discount_percent"));
+
+                                products.add(p);
+                        }
+                } catch (SQLException e) {
+                        e.printStackTrace();
+                }
+                return products;
         }
 }
