@@ -96,29 +96,20 @@ public class AuthController extends HttpServlet {
         }
     }
 
-    protected void postLogin(HttpServletRequest request, HttpServletResponse response)
+   protected void postLogin(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         String username = request.getParameter("username");
         String password = request.getParameter("password");
         Account acc = dao.findByUserName(username);
+        
         if (acc != null && BCrypt.checkpw(password, acc.getPasswordHash())) {
             HttpSession session = request.getSession();
             session.setAttribute("account", acc);
-
-            // Fetch and set cart count to session so that the badge shows correct number
-            // immediately after login
-            dao.CartDao cartDao = new dao.CartDao();
-            model.Cart cart = cartDao.getCartByAccountId(acc.getId());
-            if (cart != null) {
-                int totalItems = cartDao.getTotalItemsCount(cart.getId());
-                session.setAttribute("cartCount", totalItems);
-            }
-
+            
             String remember = request.getParameter("remember");
             if (remember != null) {
                 Cookie c = new Cookie("USERNAME_COOKIE", username);
                 c.setMaxAge(7 * 24 * 60 * 60);
-
                 response.addCookie(c);
             } else {
                 Cookie c = new Cookie("USERNAME_COOKIE", "");
@@ -126,13 +117,33 @@ public class AuthController extends HttpServlet {
                 response.addCookie(c);
             }
 
-            response.sendRedirect(request.getContextPath() + "/index");
+            
+            String role = acc.getRole();
+            
+            System.out.println("==== KIỂM TRA ROLE TỪ DB: '" + role + "' ====");
+            
+            if (role != null && role.trim().equalsIgnoreCase("ADMIN")) {
+                // Thêm request.getContextPath() để đảm bảo gọi đúng đường dẫn gốc của website
+                response.sendRedirect(request.getContextPath() + "/admin.jsp"); 
+            } else {
+                response.sendRedirect(request.getContextPath() + "/index.jsp"); 
+            }
+           
+            
+            
+            // Kiểm tra nếu role là ADMIN (không phân biệt chữ hoa/thường)
+           // if (role != null && role.equalsIgnoreCase("ADMIN")) {
+              //  response.sendRedirect("admin.jsp"); // Chuyển sang trang Admin
+            //} else {
+              //  response.sendRedirect("index.jsp"); // Chuyển về trang User bình thường
+           // }
+            // -------------------------------------------------
+
         } else {
             request.setAttribute("error", "Username or password is wrong, try again!");
             request.getRequestDispatcher("login.jsp").forward(request, response);
         }
     }
-
     private void postregister(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         String username = request.getParameter("username");
@@ -143,18 +154,28 @@ public class AuthController extends HttpServlet {
         if (dao.findByUserName(username) != null) {
             request.setAttribute("error", "User name is existed!");
             request.getRequestDispatcher("register.jsp").forward(request, response);
-            return; // PHẢI CÓ DÒNG NÀY
+            return; 
         }
 
         Account acc = new Account();
         acc.setEmail(email);
         acc.setUsername(username);
-        acc.setFullName(fullname); // thêm
-        acc.setRole("USER"); // thêm
-        acc.setStatus(true); // thêm
+        acc.setFullName(fullname); 
+        acc.setStatus(true); 
+
+        // ----- ĐOẠN XỬ LÝ PHÂN QUYỀN KHI ĐĂNG KÝ -----
+        // Mẹo test nhanh: Nếu username chứa chữ "admin" thì cho làm ADMIN, ngược lại làm USER
+        if (username != null && username.toLowerCase().contains("admin")) {
+            acc.setRole("ADMIN");
+        } else {
+            acc.setRole("USER");
+        }
+        // ---------------------------------------------
+
         String pwdHash = BCrypt.hashpw(password, BCrypt.gensalt());
         acc.setPasswordHash(pwdHash);
         dao.create(acc);
+        
         response.sendRedirect("login");
     }
 
