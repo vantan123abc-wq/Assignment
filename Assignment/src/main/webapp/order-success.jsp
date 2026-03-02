@@ -74,11 +74,11 @@
 
             <!-- Actions -->
             <div class="space-y-3">
-                <a href="index.jsp"
+                <a href="shop"
                     class="block w-full bg-primary hover:bg-[#3d8c40] text-white font-bold py-3.5 px-6 rounded-xl transition-all shadow-lg hover:shadow-xl active:scale-[0.98]">
                     Tiếp tục mua sắm
                 </a>
-                <a href="index.jsp"
+                <a href="index"
                     class="block w-full bg-slate-50 dark:bg-slate-800 hover:bg-slate-100 dark:hover:bg-slate-700 text-slate-900 dark:text-white font-semibold py-3.5 px-6 rounded-xl border border-slate-200 dark:border-slate-700 transition-all active:scale-[0.98]">
                     Về trang chủ
                 </a>

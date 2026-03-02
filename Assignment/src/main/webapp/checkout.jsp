@@ -164,6 +164,10 @@
                                 </div>
                                 <div
                                     class="bg-slate-50 dark:bg-slate-900/50 rounded-xl p-4 border border-slate-100 dark:border-slate-800 space-y-3">
+                                    <c:set var="shippingFee" value="15000" />
+                                    <c:set var="vatAmount" value="${totalAmount * 0.08}" />
+                                    <c:set var="finalTotal" value="${totalAmount + shippingFee + vatAmount}" />
+
                                     <c:forEach items="${cartItems}" var="item">
                                         <div class="flex justify-between items-center text-sm">
                                             <span
@@ -185,7 +189,16 @@
                                     </div>
                                     <div class="flex justify-between items-center text-sm">
                                         <span class="text-slate-500">Phí vận chuyển</span>
-                                        <span class="font-semibold">Miễn phí</span>
+                                        <span class="font-semibold">
+                                            <fmt:formatNumber value="${shippingFee}" type="number"
+                                                groupingUsed="true" />₫
+                                        </span>
+                                    </div>
+                                    <div class="flex justify-between items-center text-sm">
+                                        <span class="text-slate-500">Thuế (VAT 8%)</span>
+                                        <span class="font-semibold">
+                                            <fmt:formatNumber value="${vatAmount}" type="number" groupingUsed="true" />₫
+                                        </span>
                                     </div>
                                 </div>
                             </section>
@@ -201,7 +214,7 @@
                         <div class="flex items-center justify-between mb-3 px-1">
                             <span class="text-sm font-medium text-slate-500">Tổng thanh toán</span>
                             <span class="text-2xl font-black text-primary">
-                                <fmt:formatNumber value="${totalAmount}" type="number" groupingUsed="true" />₫
+                                <fmt:formatNumber value="${finalTotal}" type="number" groupingUsed="true" />₫
                             </span>
                         </div>
                         <button type="submit" form="checkoutForm"

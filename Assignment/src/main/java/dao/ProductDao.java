@@ -117,7 +117,7 @@ public class ProductDao {
         public List<model.FeaturedProduct> getTopBestSellers(int limit) {
                 List<model.FeaturedProduct> products = new ArrayList<>();
                 String query = "SELECT p.id, p.category_id, p.name, p.price, p.stock as quantity, p.description, p.image_url, p.discount_percent, "
-                                + "ISNULL((SELECT SUM(oi.quantity) FROM OrderItems oi JOIN Payment pm ON oi.order_id = pm.order_id WHERE oi.product_id = p.id AND pm.status = 'PAID'), 0) as soldQty, "
+                                + "ISNULL((SELECT SUM(oi.quantity) FROM OrderItems oi JOIN Payment pm ON oi.order_id = pm.order_id WHERE oi.product_id = p.id AND pm.status IN ('PAID', 'PENDING')), 0) as soldQty, "
                                 + "ISNULL((SELECT SUM(ci.quantity) FROM CartItem ci WHERE ci.product_id = p.id), 0) as cartQty "
                                 + "FROM Product p "
                                 + "ORDER BY soldQty DESC, cartQty DESC, p.id DESC "
