@@ -96,16 +96,26 @@ public class AuthController extends HttpServlet {
         }
     }
 
-   protected void postLogin(HttpServletRequest request, HttpServletResponse response)
+    protected void postLogin(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         String username = request.getParameter("username");
         String password = request.getParameter("password");
         Account acc = dao.findByUserName(username);
-        
-        if (acc != null && BCrypt.checkpw(password, acc.getPasswordHash())) {
+
+        boolean isPasswordMatch = false;
+        if (acc != null && acc.getPasswordHash() != null) {
+            try {
+                isPasswordMatch = BCrypt.checkpw(password, acc.getPasswordHash());
+            } catch (IllegalArgumentException e) {
+                // Fallback cho trường hợp mật khẩu trong database là plain text (chưa mã hóa)
+                isPasswordMatch = password.equals(acc.getPasswordHash());
+            }
+        }
+
+        if (isPasswordMatch) {
             HttpSession session = request.getSession();
             session.setAttribute("account", acc);
-            
+
             String remember = request.getParameter("remember");
             if (remember != null) {
                 Cookie c = new Cookie("USERNAME_COOKIE", username);
@@ -117,26 +127,23 @@ public class AuthController extends HttpServlet {
                 response.addCookie(c);
             }
 
-            
             String role = acc.getRole();
-            
+
             System.out.println("==== KIỂM TRA ROLE TỪ DB: '" + role + "' ====");
-            
+
             if (role != null && role.trim().equalsIgnoreCase("ADMIN")) {
                 // Thêm request.getContextPath() để đảm bảo gọi đúng đường dẫn gốc của website
-                response.sendRedirect(request.getContextPath() + "/admin.jsp"); 
+                response.sendRedirect(request.getContextPath() + "/admin");
             } else {
-                response.sendRedirect(request.getContextPath() + "/index.jsp"); 
+                response.sendRedirect(request.getContextPath() + "/index.jsp");
             }
-           
-            
-            
+
             // Kiểm tra nếu role là ADMIN (không phân biệt chữ hoa/thường)
-           // if (role != null && role.equalsIgnoreCase("ADMIN")) {
-              //  response.sendRedirect("admin.jsp"); // Chuyển sang trang Admin
-            //} else {
-              //  response.sendRedirect("index.jsp"); // Chuyển về trang User bình thường
-           // }
+            // if (role != null && role.equalsIgnoreCase("ADMIN")) {
+            // response.sendRedirect("admin"); // Chuyển sang trang Admin
+            // } else {
+            // response.sendRedirect("index.jsp"); // Chuyển về trang User bình thường
+            // }
             // -------------------------------------------------
 
         } else {
@@ -144,6 +151,7 @@ public class AuthController extends HttpServlet {
             request.getRequestDispatcher("login.jsp").forward(request, response);
         }
     }
+
     private void postregister(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         String username = request.getParameter("username");
@@ -154,17 +162,18 @@ public class AuthController extends HttpServlet {
         if (dao.findByUserName(username) != null) {
             request.setAttribute("error", "User name is existed!");
             request.getRequestDispatcher("register.jsp").forward(request, response);
-            return; 
+            return;
         }
 
         Account acc = new Account();
         acc.setEmail(email);
         acc.setUsername(username);
-        acc.setFullName(fullname); 
-        acc.setStatus(true); 
+        acc.setFullName(fullname);
+        acc.setStatus(true);
 
         // ----- ĐOẠN XỬ LÝ PHÂN QUYỀN KHI ĐĂNG KÝ -----
-        // Mẹo test nhanh: Nếu username chứa chữ "admin" thì cho làm ADMIN, ngược lại làm USER
+        // Mẹo test nhanh: Nếu username chứa chữ "admin" thì cho làm ADMIN, ngược lại
+        // làm USER
         if (username != null && username.toLowerCase().contains("admin")) {
             acc.setRole("ADMIN");
         } else {
@@ -175,7 +184,7 @@ public class AuthController extends HttpServlet {
         String pwdHash = BCrypt.hashpw(password, BCrypt.gensalt());
         acc.setPasswordHash(pwdHash);
         dao.create(acc);
-        
+
         response.sendRedirect("login");
     }
 

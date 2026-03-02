@@ -14,12 +14,12 @@ public class GeminiConfig {
         }
         // Fallback for demo if properties aren't configured natively
         if (key == null || key.isEmpty()) {
-            return "AIzaSyDstpVzSC9PPN-aqQB7Ghr8rtKpY4h_Xx8"; // User provided key
+            return "AIzaSyDk4DOHQCtHNgiYX_QTACKFz-nqGFrWpUA"; // User provided key
         }
         return key;
     }
 
     public static String getModelEndpoint() {
-        return "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent";
+        return "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent";
     }
 }

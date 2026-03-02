@@ -79,4 +79,113 @@ public class AccountDao {
             em.close();
         }
     }
+
+    public long countAllUsers() {
+        EntityManager em = emf.createEntityManager();
+        try {
+            return em.createQuery("SELECT COUNT(a) FROM Account a", Long.class).getSingleResult();
+        } finally {
+            em.close();
+        }
+    }
+
+    public long countActiveUsers() {
+        EntityManager em = emf.createEntityManager();
+        try {
+            return em.createQuery("SELECT COUNT(a) FROM Account a WHERE a.status = true", Long.class).getSingleResult();
+        } finally {
+            em.close();
+        }
+    }
+
+    public long countNewUsers(int days) {
+        EntityManager em = emf.createEntityManager();
+        try {
+            java.util.Calendar cal = java.util.Calendar.getInstance();
+            cal.add(java.util.Calendar.DAY_OF_YEAR, -days);
+            java.util.Date thresholdDate = cal.getTime();
+            return em.createQuery("SELECT COUNT(a) FROM Account a WHERE a.createdAt >= :date", Long.class)
+                    .setParameter("date", thresholdDate)
+                    .getSingleResult();
+        } finally {
+            em.close();
+        }
+    }
+
+    public long countUsers(String roleKeyword, String searchKeyword) {
+        EntityManager em = emf.createEntityManager();
+        try {
+            String jpql = "SELECT COUNT(a) FROM Account a WHERE 1=1";
+            if (roleKeyword != null && !roleKeyword.isEmpty() && !roleKeyword.equalsIgnoreCase("All")
+                    && !roleKeyword.equalsIgnoreCase("Tất cả")) {
+                jpql += " AND a.role = :role";
+            }
+            if (searchKeyword != null && !searchKeyword.trim().isEmpty()) {
+                jpql += " AND (a.username LIKE :kw OR a.email LIKE :kw OR a.fullName LIKE :kw)";
+            }
+            var query = em.createQuery(jpql, Long.class);
+            if (roleKeyword != null && !roleKeyword.isEmpty() && !roleKeyword.equalsIgnoreCase("All")
+                    && !roleKeyword.equalsIgnoreCase("Tất cả")) {
+                query.setParameter("role", roleKeyword);
+            }
+            if (searchKeyword != null && !searchKeyword.trim().isEmpty()) {
+                query.setParameter("kw", "%" + searchKeyword.trim() + "%");
+            }
+            return query.getSingleResult();
+        } finally {
+            em.close();
+        }
+    }
+
+    public java.util.List<Account> findUsers(String roleKeyword, String searchKeyword, int page, int size) {
+        EntityManager em = emf.createEntityManager();
+        try {
+            String jpql = "SELECT a FROM Account a WHERE 1=1";
+            if (roleKeyword != null && !roleKeyword.isEmpty() && !roleKeyword.equalsIgnoreCase("All")
+                    && !roleKeyword.equalsIgnoreCase("Tất cả")) {
+                jpql += " AND a.role = :role";
+            }
+            if (searchKeyword != null && !searchKeyword.trim().isEmpty()) {
+                jpql += " AND (a.username LIKE :kw OR a.email LIKE :kw OR a.fullName LIKE :kw)";
+            }
+            jpql += " ORDER BY a.id DESC"; // Default order
+
+            var query = em.createQuery(jpql, Account.class);
+            if (roleKeyword != null && !roleKeyword.isEmpty() && !roleKeyword.equalsIgnoreCase("All")
+                    && !roleKeyword.equalsIgnoreCase("Tất cả")) {
+                query.setParameter("role", roleKeyword);
+            }
+            if (searchKeyword != null && !searchKeyword.trim().isEmpty()) {
+                query.setParameter("kw", "%" + searchKeyword.trim() + "%");
+            }
+
+            int offset = (page - 1) * size;
+            query.setFirstResult(offset);
+            query.setMaxResults(size);
+
+            return query.getResultList();
+        } finally {
+            em.close();
+        }
+    }
+
+    public void toggleUserStatus(int id) {
+        EntityManager em = emf.createEntityManager();
+        EntityTransaction tx = em.getTransaction();
+        try {
+            tx.begin();
+            Account a = em.find(Account.class, id);
+            if (a != null) {
+                a.setStatus(!a.getStatus());
+                em.merge(a);
+            }
+            tx.commit();
+        } catch (Exception e) {
+            if (tx.isActive())
+                tx.rollback();
+            e.printStackTrace();
+        } finally {
+            em.close();
+        }
+    }
 }

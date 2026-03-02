@@ -8,6 +8,8 @@ public class Product {
     private int quantity;
     private String description;
     private Integer discountPercent;
+    private String imageUrl;
+    private String categoryName;
 
     public Product() {
     }
@@ -81,6 +83,22 @@ public class Product {
             return price;
         }
         return price * (100 - discountPercent) / 100.0;
+    }
+
+    public String getImageUrl() {
+        return imageUrl;
+    }
+
+    public void setImageUrl(String imageUrl) {
+        this.imageUrl = imageUrl;
+    }
+
+    public String getCategoryName() {
+        return categoryName;
+    }
+
+    public void setCategoryName(String categoryName) {
+        this.categoryName = categoryName;
     }
 
     @Override
