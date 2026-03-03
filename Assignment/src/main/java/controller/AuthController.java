@@ -113,6 +113,14 @@ public class AuthController extends HttpServlet {
         }
 
         if (isPasswordMatch) {
+            // Kiểm tra tài khoản có bị vô hiệu hóa không
+            if (!acc.getStatus()) {
+                request.setAttribute("error",
+                        "Tài khoản của bạn đã bị vô hiệu hóa. Vui lòng liên hệ quản trị viên để được hỗ trợ.");
+                request.getRequestDispatcher("login.jsp").forward(request, response);
+                return;
+            }
+
             HttpSession session = request.getSession();
             session.setAttribute("account", acc);
 
@@ -132,19 +140,10 @@ public class AuthController extends HttpServlet {
             System.out.println("==== KIỂM TRA ROLE TỪ DB: '" + role + "' ====");
 
             if (role != null && role.trim().equalsIgnoreCase("ADMIN")) {
-                // Thêm request.getContextPath() để đảm bảo gọi đúng đường dẫn gốc của website
                 response.sendRedirect(request.getContextPath() + "/admin");
             } else {
                 response.sendRedirect(request.getContextPath() + "/index.jsp");
             }
-
-            // Kiểm tra nếu role là ADMIN (không phân biệt chữ hoa/thường)
-            // if (role != null && role.equalsIgnoreCase("ADMIN")) {
-            // response.sendRedirect("admin"); // Chuyển sang trang Admin
-            // } else {
-            // response.sendRedirect("index.jsp"); // Chuyển về trang User bình thường
-            // }
-            // -------------------------------------------------
 
         } else {
             request.setAttribute("error", "Username or password is wrong, try again!");

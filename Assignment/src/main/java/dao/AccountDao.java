@@ -169,6 +169,61 @@ public class AccountDao {
         }
     }
 
+    public void updateAccount(int id, String fullName, String email, String phone, String role) {
+        EntityManager em = emf.createEntityManager();
+        EntityTransaction tx = em.getTransaction();
+        try {
+            tx.begin();
+            Account a = em.find(Account.class, id);
+            if (a != null) {
+                if (fullName != null && !fullName.trim().isEmpty())
+                    a.setFullName(fullName.trim());
+                if (email != null && !email.trim().isEmpty())
+                    a.setEmail(email.trim());
+                a.setPhone(phone != null ? phone.trim() : null);
+                if (role != null && !role.trim().isEmpty())
+                    a.setRole(role.trim());
+                em.merge(a);
+            }
+            tx.commit();
+        } catch (Exception e) {
+            if (tx.isActive())
+                tx.rollback();
+            e.printStackTrace();
+        } finally {
+            em.close();
+        }
+    }
+
+    public Account findById(int id) {
+        EntityManager em = emf.createEntityManager();
+        try {
+            return em.find(Account.class, id);
+        } finally {
+            em.close();
+        }
+    }
+
+    public void changeRole(int id, String newRole) {
+        EntityManager em = emf.createEntityManager();
+        EntityTransaction tx = em.getTransaction();
+        try {
+            tx.begin();
+            Account a = em.find(Account.class, id);
+            if (a != null) {
+                a.setRole(newRole);
+                em.merge(a);
+            }
+            tx.commit();
+        } catch (Exception e) {
+            if (tx.isActive())
+                tx.rollback();
+            e.printStackTrace();
+        } finally {
+            em.close();
+        }
+    }
+
     public void toggleUserStatus(int id) {
         EntityManager em = emf.createEntityManager();
         EntityTransaction tx = em.getTransaction();

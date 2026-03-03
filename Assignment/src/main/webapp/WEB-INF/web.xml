@@ -1,11 +1,32 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<web-app version="6.0" xmlns="https://jakarta.ee/xml/ns/jakartaee" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="https://jakarta.ee/xml/ns/jakartaee https://jakarta.ee/xml/ns/jakartaee/web-app_6_0.xsd">
+<web-app xmlns="https://jakarta.ee/xml/ns/jakartaee"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="https://jakarta.ee/xml/ns/jakartaee
+                             https://jakarta.ee/xml/ns/jakartaee/web-app_6_0.xsd"
+         version="6.0">
+
+    <!-- Cloudinary config -->
+    <context-param>
+        <param-name>CLOUD_NAME</param-name>
+        <param-value>dk3khyzub</param-value>
+    </context-param>
+
+    <context-param>
+        <param-name>API_KEY</param-name>
+        <param-value>426629568762242</param-value>
+    </context-param>
+
+    <context-param>
+        <param-name>API_SECRET</param-name>
+        <param-value>iLxmI29_s8n4TS8sWDQfFVTa9hw</param-value>
+    </context-param>
+
     <session-config>
-        <session-timeout>
-            30
-        </session-timeout>
+        <session-timeout>30</session-timeout>
     </session-config>
+
     <welcome-file-list>
         <welcome-file>index</welcome-file>
     </welcome-file-list>
+
 </web-app>
