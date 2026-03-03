@@ -37,6 +37,8 @@ public class AuthFilter implements Filter {
                 uri.endsWith("/forget") ||
                 uri.endsWith("/verify.jsp") ||
                 uri.endsWith("/verify") ||
+                uri.endsWith("/test-upload.jsp") ||
+                uri.endsWith("/test-upload2.jsp") ||
                 uri.contains("/assets/")) {
 
             chain.doFilter(request, response);
@@ -55,9 +57,9 @@ public class AuthFilter implements Filter {
         if (uri.contains("demo.jsp") || uri.contains("/admin")) {
             Account acc = (Account) session.getAttribute("account");
             String role = acc.getRole();
-            
+
             System.out.println("=== FILTER CHECK: Người dùng truy cập trang Admin có role là: " + role + " ===");
-            
+
             if (role == null || !role.trim().equalsIgnoreCase("ADMIN")) {
                 System.out.println("=== FILTER CHẶN: Không phải Admin, đẩy về trang chủ! ===");
                 res.sendRedirect(req.getContextPath() + "/index.jsp");

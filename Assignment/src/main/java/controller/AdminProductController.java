@@ -9,11 +9,18 @@ import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.Part;
+import jakarta.servlet.annotation.MultipartConfig;
 import model.Category;
 import model.Product;
+import config.CloudinaryConfig;
 
 @WebServlet(name = "AdminProductController", urlPatterns = { "/admin/product/create", "/admin/product/edit",
         "/admin/product/delete" })
+@MultipartConfig(fileSizeThreshold = 1024 * 1024 * 1, // 1 MB
+        maxFileSize = 1024 * 1024 * 10, // 10 MB
+        maxRequestSize = 1024 * 1024 * 100 // 100 MB
+)
 public class AdminProductController extends HttpServlet {
 
     private final ProductDao productDao = new ProductDao();
@@ -81,7 +88,29 @@ public class AdminProductController extends HttpServlet {
             p.setPrice(Double.parseDouble(request.getParameter("price")));
             p.setQuantity(Integer.parseInt(request.getParameter("stock")));
             p.setDescription(request.getParameter("description"));
-            p.setImageUrl(request.getParameter("imageUrl"));
+
+            // Handle Image Upload with Cloudinary
+            String textUrl = request.getParameter("imageUrl");
+            Part filePart = request.getPart("imageFile");
+            String finalImageUrl = null;
+
+            if (filePart != null && filePart.getSize() > 0) {
+                // Upload to Cloudinary
+                CloudinaryConfig cloudConfig = new CloudinaryConfig(request.getServletContext());
+                try (java.io.InputStream inputStream = filePart.getInputStream()) {
+                    byte[] fileBytes = inputStream.readAllBytes();
+                    @SuppressWarnings("unchecked")
+                    java.util.Map<String, Object> uploadResult = cloudConfig.getClient().uploader().upload(fileBytes,
+                            com.cloudinary.utils.ObjectUtils.emptyMap());
+                    finalImageUrl = (String) uploadResult.get("secure_url");
+                } catch (Exception ex) {
+                    ex.printStackTrace();
+                    System.out.println("Cloudinary Upload Error: " + ex.getMessage());
+                }
+            } else if (textUrl != null && !textUrl.trim().isEmpty()) {
+                finalImageUrl = textUrl.trim();
+            }
+            p.setImageUrl(finalImageUrl);
 
             String discountStr = request.getParameter("discountPercent");
             if (discountStr != null && !discountStr.trim().isEmpty()) {
@@ -105,7 +134,34 @@ public class AdminProductController extends HttpServlet {
             p.setPrice(Double.parseDouble(request.getParameter("price")));
             p.setQuantity(Integer.parseInt(request.getParameter("stock")));
             p.setDescription(request.getParameter("description"));
-            p.setImageUrl(request.getParameter("imageUrl"));
+
+            // Handle Image Upload with Cloudinary
+            String textUrl = request.getParameter("imageUrl");
+            Part filePart = request.getPart("imageFile");
+            String finalImageUrl = null;
+
+            if (filePart != null && filePart.getSize() > 0) {
+                // Upload to Cloudinary
+                CloudinaryConfig cloudConfig = new CloudinaryConfig(request.getServletContext());
+                try (java.io.InputStream inputStream = filePart.getInputStream()) {
+                    byte[] fileBytes = inputStream.readAllBytes();
+                    @SuppressWarnings("unchecked")
+                    java.util.Map<String, Object> uploadResult = cloudConfig.getClient().uploader().upload(fileBytes,
+                            com.cloudinary.utils.ObjectUtils.emptyMap());
+                    finalImageUrl = (String) uploadResult.get("secure_url");
+                } catch (Exception ex) {
+                    ex.printStackTrace();
+                    System.out.println("Cloudinary Edit Upload Error: " + ex.getMessage());
+                }
+            } else if (textUrl != null && !textUrl.trim().isEmpty()) {
+                finalImageUrl = textUrl.trim();
+            }
+
+            // For editing, if both are empty, we might want to keep the old image.
+            // But based on the UI flow, if they clear both, they might intend to delete it.
+            // If we want to strictly keep the old one, we need to fetch it first.
+            // For now, if no file and no URL and user submitted, it updates to null.
+            p.setImageUrl(finalImageUrl);
 
             String discountStr = request.getParameter("discountPercent");
             if (discountStr != null && !discountStr.trim().isEmpty()) {

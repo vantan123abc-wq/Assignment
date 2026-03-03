@@ -81,6 +81,44 @@ public class AdminUserController extends HttpServlet {
                     e.printStackTrace();
                 }
             }
+        } else if ("create".equals(action)) {
+            String username = request.getParameter("username");
+            String password = request.getParameter("password");
+            String fullname = request.getParameter("fullName");
+            String email = request.getParameter("email");
+            String phone = request.getParameter("phone");
+            String newRole = request.getParameter("newRole");
+
+            if (username != null && password != null && email != null) {
+                if (accountDao.findByUserName(username) == null && accountDao.findByEmail(email) == null) {
+                    Account acc = new Account();
+                    acc.setUsername(username);
+                    acc.setEmail(email);
+                    acc.setFullName(fullname);
+                    acc.setPhone(phone);
+                    acc.setStatus(true);
+                    acc.setRole(newRole != null && !newRole.isEmpty() ? newRole : "USER");
+
+                    String pwdHash = org.mindrot.jbcrypt.BCrypt.hashpw(password, org.mindrot.jbcrypt.BCrypt.gensalt());
+                    acc.setPasswordHash(pwdHash);
+
+                    accountDao.create(acc);
+                }
+            }
+        } else if ("update".equals(action)) {
+            String idStr2 = request.getParameter("id");
+            if (idStr2 != null && !idStr2.isEmpty()) {
+                try {
+                    int uid = Integer.parseInt(idStr2);
+                    String fullName = request.getParameter("fullName");
+                    String email = request.getParameter("email");
+                    String phone = request.getParameter("phone");
+                    String newRole = request.getParameter("newRole");
+                    accountDao.updateAccount(uid, fullName, email, phone, newRole);
+                } catch (NumberFormatException e) {
+                    e.printStackTrace();
+                }
+            }
         }
 
         // Preserve query parameters on redirect

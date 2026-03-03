@@ -75,7 +75,7 @@
                         <div class="p-8 max-w-4xl mx-auto w-full">
                             <form
                                 action="${pageContext.request.contextPath}${isEdit ? '/admin/product/edit' : '/admin/product/create'}"
-                                method="POST"
+                                method="POST" enctype="multipart/form-data"
                                 class="bg-white rounded-xl border border-slate-200 shadow-sm p-6 overflow-hidden">
                                 <c:if test="${isEdit}">
                                     <input type="hidden" name="id" value="${product.id}" />
@@ -104,14 +104,52 @@
                                         </select>
                                     </div>
 
-                                    <!-- Link Ảnh -->
-                                    <div>
-                                        <label class="block text-sm font-bold text-slate-700 mb-2">Đường dẫn ảnh
-                                            (URL)</label>
-                                        <input type="url" name="imageUrl"
-                                            value="${product.imageUrl != null ? product.imageUrl : (product.description != null && product.description.startsWith('http') ? product.description : '')}"
-                                            class="w-full text-sm border-slate-300 rounded-lg focus:ring-primary focus:border-primary px-4 py-2"
-                                            placeholder="https://...">
+                                    <!-- Link Ảnh / Tải ảnh -->
+                                    <div
+                                        class="col-span-1 md:col-span-2 space-y-4 border border-slate-200 rounded-xl p-4 bg-slate-50/50">
+                                        <label class="block text-sm font-bold text-slate-800">Ảnh sản phẩm</label>
+                                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                            <!-- Tải từ máy tính -->
+                                            <div>
+                                                <label class="block text-xs font-semibold text-slate-600 mb-2">Tùy chọn
+                                                    1: Tải ảnh lên</label>
+                                                <div class="relative w-full">
+                                                    <input type="file" name="imageFile" id="imageFile" accept="image/*"
+                                                        class="w-full text-sm text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-primary/10 file:text-primary hover:file:bg-primary/20 transition-all cursor-pointer border border-slate-300 rounded-lg bg-white" />
+                                                </div>
+                                                <p class="text-[11px] text-slate-500 mt-2">Hệ thống sẽ ưu tiên dùng ảnh
+                                                    tải lên nếu bạn chọn file.</p>
+                                            </div>
+
+                                            <!-- Dán URL -->
+                                            <div>
+                                                <label class="block text-xs font-semibold text-slate-600 mb-2">Tùy chọn
+                                                    2: Dán đường dẫn URL</label>
+                                                <input type="url" name="imageUrl" id="imageUrl"
+                                                    value="${product.imageUrl != null ? product.imageUrl : (product.description != null && product.description.startsWith('http') ? product.description : '')}"
+                                                    class="w-full text-sm border-slate-300 rounded-lg focus:ring-primary focus:border-primary px-4 py-[9px] bg-white"
+                                                    placeholder="https://...">
+                                            </div>
+                                        </div>
+
+                                        <!-- Image Preview Block -->
+                                        <div
+                                            class="mt-4 p-4 bg-white border border-slate-200 border-dashed rounded-lg flex gap-4 items-center min-h-[120px]">
+                                            <div
+                                                class="size-20 bg-slate-100 rounded-lg overflow-hidden shrink-0 border border-slate-200 flex items-center justify-center relative group">
+                                                <img id="imagePreview"
+                                                    src="${(product.imageUrl != null && not empty product.imageUrl) ? product.imageUrl : ((product.description != null && product.description.startsWith('http')) ? product.description : '')}"
+                                                    alt="Preview"
+                                                    class="w-full h-full object-cover ${(product.imageUrl == null || empty product.imageUrl) && (product.description == null || !product.description.startsWith('http')) ? 'hidden' : ''}" />
+                                                <span id="imagePreviewPlaceholder"
+                                                    class="material-symbols-outlined text-slate-300 text-3xl ${(product.imageUrl != null && not empty product.imageUrl) || (product.description != null && product.description.startsWith('http')) ? 'hidden' : ''}">hide_image</span>
+                                            </div>
+                                            <div class="flex-1">
+                                                <p class="text-sm font-semibold text-slate-700">Ảnh xem trước</p>
+                                                <p class="text-xs text-slate-500 mt-1">Sẽ tự cập nhật nếu bạn chèn URL
+                                                    hoặc chọn Text. Ảnh tải lên luôn được ưu tiên hơn Dán URL.</p>
+                                            </div>
+                                        </div>
                                     </div>
 
                                     <!-- Giá bán -->
@@ -166,6 +204,37 @@
                         </div>
                     </main>
                 </div>
+
+                <script>
+                    const imageFile = document.getElementById('imageFile');
+                    const imageUrl = document.getElementById('imageUrl');
+                    const imagePreview = document.getElementById('imagePreview');
+                    const imagePreviewPlaceholder = document.getElementById('imagePreviewPlaceholder');
+
+                    function updatePreview() {
+                        const file = imageFile.files[0];
+                        if (file) {
+                            const reader = new FileReader();
+                            reader.onload = function (e) {
+                                imagePreview.src = e.target.result;
+                                imagePreview.classList.remove('hidden');
+                                imagePreviewPlaceholder.classList.add('hidden');
+                            };
+                            reader.readAsDataURL(file);
+                        } else if (imageUrl.value.trim() !== '') {
+                            imagePreview.src = imageUrl.value;
+                            imagePreview.classList.remove('hidden');
+                            imagePreviewPlaceholder.classList.add('hidden');
+                        } else {
+                            imagePreview.src = '';
+                            imagePreview.classList.add('hidden');
+                            imagePreviewPlaceholder.classList.remove('hidden');
+                        }
+                    }
+
+                    imageFile.addEventListener('change', updatePreview);
+                    imageUrl.addEventListener('input', updatePreview);
+                </script>
             </body>
 
             </html>

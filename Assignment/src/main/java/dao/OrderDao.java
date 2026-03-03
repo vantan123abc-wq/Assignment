@@ -4,6 +4,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.Statement;
+import java.util.ArrayList;
 import java.util.List;
 import model.CartItem;
 import model.Order;
@@ -106,6 +107,50 @@ public class OrderDao {
                 }
             }
         }
+    }
+
+    public List<Order> findOrdersByAccount(int accountId, int page, int size) {
+        List<Order> orders = new ArrayList<>();
+        String sql = "SELECT id, account_id, address_id, total_amount, status, created_at FROM Orders " +
+                "WHERE account_id = ? ORDER BY created_at DESC " +
+                "OFFSET ? ROWS FETCH NEXT ? ROWS ONLY";
+        int offset = (page - 1) * size;
+        try (Connection conn = DBConnection.getConnection();
+                PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setInt(1, accountId);
+            ps.setInt(2, offset);
+            ps.setInt(3, size);
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    Order o = new Order();
+                    o.setId(rs.getInt("id"));
+                    o.setAccountId(rs.getInt("account_id"));
+                    o.setAddressId(rs.getInt("address_id"));
+                    o.setTotalAmount(rs.getDouble("total_amount"));
+                    o.setStatus(rs.getString("status"));
+                    o.setCreatedAt(rs.getTimestamp("created_at"));
+                    orders.add(o);
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return orders;
+    }
+
+    public int countOrdersByAccount(int accountId) {
+        String sql = "SELECT COUNT(*) FROM Orders WHERE account_id = ?";
+        try (Connection conn = DBConnection.getConnection();
+                PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setInt(1, accountId);
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next())
+                    return rs.getInt(1);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return 0;
     }
 
     public boolean markPaid(int orderId, String method) {
