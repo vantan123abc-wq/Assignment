@@ -106,8 +106,8 @@ public class ProductDao {
                         return ps.executeUpdate() > 0;
                 } catch (Exception e) {
                         e.printStackTrace();
+                        throw new RuntimeException("Lỗi Database khi Insert Product: " + e.getMessage(), e);
                 }
-                return false;
         }
 
         public boolean update(Product p) {

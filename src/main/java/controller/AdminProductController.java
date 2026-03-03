@@ -82,6 +82,7 @@ public class AdminProductController extends HttpServlet {
 
     private void createProduct(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
+        request.setCharacterEncoding("UTF-8");
         try {
             Product p = new Product();
             p.setName(request.getParameter("name"));
@@ -89,7 +90,13 @@ public class AdminProductController extends HttpServlet {
             p.setPrice(Double.parseDouble(request.getParameter("price")));
             p.setQuantity(Integer.parseInt(request.getParameter("stock")));
             p.setDescription(request.getParameter("description"));
-            p.setImageUrl(request.getParameter("imageUrl"));
+
+            String imageUrl = request.getParameter("imageUrl");
+            if (imageUrl != null && imageUrl.length() > 255) {
+                imageUrl = imageUrl.substring(0, 255);
+            }
+            p.setImageUrl(imageUrl);
+
             p.setNotified(false);
 
             String discountStr = request.getParameter("discountPercent");
@@ -100,6 +107,7 @@ public class AdminProductController extends HttpServlet {
             productDao.insert(p);
         } catch (Exception e) {
             e.printStackTrace();
+            throw new ServletException("Lỗi Insert Product: " + e.getMessage(), e);
         }
         response.sendRedirect(request.getContextPath() + "/admin/inventory");
     }
@@ -119,7 +127,12 @@ public class AdminProductController extends HttpServlet {
             p.setPrice(Double.parseDouble(request.getParameter("price")));
             p.setQuantity(Integer.parseInt(request.getParameter("stock")));
             p.setDescription(request.getParameter("description"));
-            p.setImageUrl(request.getParameter("imageUrl"));
+
+            String imageUrl = request.getParameter("imageUrl");
+            if (imageUrl != null && imageUrl.length() > 255) {
+                imageUrl = imageUrl.substring(0, 255);
+            }
+            p.setImageUrl(imageUrl);
 
             Integer newDiscount = null;
             String discountStr = request.getParameter("discountPercent");
@@ -132,16 +145,27 @@ public class AdminProductController extends HttpServlet {
             // Nếu discount thay đổi → reset isNotified về false
             Integer oldDiscount = (oldProduct != null) ? oldProduct.getDiscountPercent() : null;
             boolean discountChanged = !java.util.Objects.equals(oldDiscount, newDiscount);
+
+            System.out.println("=== EDIT PRODUCT DEBUG ===");
+            System.out.println("ID: " + id);
+            System.out.println("Old Discount: " + oldDiscount);
+            System.out.println("New Discount: " + newDiscount);
+            System.out.println("Discount Changed: " + discountChanged);
+
             if (discountChanged) {
                 p.setNotified(false); // discount mới → cho phép gửi lại
             } else {
                 p.setNotified(oldProduct != null && oldProduct.isNotified()); // giữ nguyên
             }
+            System.out.println("isNotified before update DB: " + p.isNotified());
 
             productDao.update(p);
 
             // --- Gửi email nếu discount > 0 và chưa gửi ---
-            if (newDiscount != null && newDiscount > 0 && !p.isNotified()) {
+            boolean shouldSendEmail = (newDiscount != null && newDiscount > 0 && !p.isNotified());
+            System.out.println("Should send email?: " + shouldSendEmail);
+
+            if (shouldSendEmail) {
                 String baseUrl = request.getScheme() + "://" + request.getServerName()
                         + ":" + request.getServerPort() + request.getContextPath();
                 sendDiscountNotifications(p, baseUrl);
@@ -149,6 +173,7 @@ public class AdminProductController extends HttpServlet {
 
         } catch (Exception e) {
             e.printStackTrace();
+            throw new ServletException("Lỗi Edit Product: " + e.getMessage(), e);
         }
         response.sendRedirect(request.getContextPath() + "/admin/inventory");
     }
@@ -160,7 +185,8 @@ public class AdminProductController extends HttpServlet {
     private void sendDiscountNotifications(Product p, String baseUrl) {
         try {
             List<String> emails = subscriberDAO.getAllActiveEmails();
-            if (emails.isEmpty()) return;
+            if (emails.isEmpty())
+                return;
 
             String subject = "🎉 Sản phẩm đang giảm giá!";
             String productLink = baseUrl + "/shop?id=" + p.getId();
