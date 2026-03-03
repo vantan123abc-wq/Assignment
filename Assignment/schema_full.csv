@@ -1,0 +1,19 @@
+TABLE_NAME,COLUMN_NAME,DATA_TYPE
+----------,-----------,---------
+OrderItems,id,int
+OrderItems,order_id,int
+OrderItems,product_id,int
+OrderItems,price,decimal
+OrderItems,quantity,int
+Orders,id,int
+Orders,account_id,int
+Orders,address_id,int
+Orders,total_amount,decimal
+Orders,status,varchar
+Orders,created_at,datetime2
+Payment,id,int
+Payment,order_id,int
+Payment,method,varchar
+Payment,status,varchar
+
+(15 rows affected)
