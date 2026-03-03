@@ -98,7 +98,7 @@
                             class="flex items-center gap-3 px-4 py-3 text-slate-500 hover:bg-slate-50 hover:text-primary rounded-xl font-medium transition-colors">
                             <span class="material-symbols-outlined">inventory_2</span> Kho hàng
                         </a>
-                        <a href="#"
+                        <a href="${pageContext.request.contextPath}/admin/orders"
                             class="flex items-center gap-3 px-4 py-3 text-slate-500 hover:bg-slate-50 hover:text-primary rounded-xl font-medium transition-colors">
                             <span class="material-symbols-outlined">receipt_long</span> Đơn hàng
                         </a>
