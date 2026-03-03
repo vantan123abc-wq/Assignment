@@ -1,0 +1,14 @@
+TABLE_NAME,COLUMN_NAME,DATA_TYPE
+----------,-----------,---------
+Orders,id,int
+Orders,account_id,int
+Orders,address_id,int
+Orders,total_amount,decimal
+Orders,status,varchar
+Orders,created_at,datetime2
+Payment,id,int
+Payment,order_id,int
+Payment,method,varchar
+Payment,status,varchar
+
+(10 rows affected)
