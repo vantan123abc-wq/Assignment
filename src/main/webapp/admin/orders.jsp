@@ -51,10 +51,10 @@
     <div class="sidebar">
         <div class="logo">Admin Panel</div>
         <div class="nav-menu">
-            <a href="dashboard.jsp" class="nav-item"><i class="fa-solid fa-chart-pie"></i> Tổng quan</a>
-            <a href="users.jsp" class="nav-item"><i class="fa-solid fa-user-group"></i> Người dùng</a>
-            <a href="inventory.jsp" class="nav-item"><i class="fa-solid fa-box"></i> Kho hàng</a>
-            <a href="orders.jsp" class="nav-item active"><i class="fa-solid fa-receipt"></i> Đơn hàng</a>
+            <a href="${pageContext.request.contextPath}/admin" class="nav-item"><i class="fa-solid fa-chart-pie"></i> Tổng quan</a>
+            <a href="${pageContext.request.contextPath}/admin/users" class="nav-item"><i class="fa-solid fa-user-group"></i> Người dùng</a>
+            <a href="${pageContext.request.contextPath}/admin/inventory" class="nav-item"><i class="fa-solid fa-box"></i> Kho hàng</a>
+            <a href="${pageContext.request.contextPath}/admin/orders" class="nav-item active"><i class="fa-solid fa-receipt"></i> Đơn hàng</a>
         </div>
         <div class="logout-btn-container">
             <a href="../logout" class="logout-btn"><i class="fa-solid fa-arrow-right-from-bracket"></i> Đăng xuất</a>
