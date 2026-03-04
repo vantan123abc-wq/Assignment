@@ -86,9 +86,9 @@
                     </div>
 
                     <nav class="flex-1 overflow-y-auto py-6 px-4 space-y-2">
-                        <a href="#"
+                        <a href="${pageContext.request.contextPath}/admin"
                             class="flex items-center gap-3 px-4 py-3 bg-primary/10 text-primary rounded-xl font-semibold transition-colors">
-                            <span class="material-symbols-outlined">dashboard</span> Tổng quan (Chart)
+                            <span class="material-symbols-outlined">dashboard</span> Tổng quan 
                         </a>
                         <a href="${pageContext.request.contextPath}/admin/users"
                             class="flex items-center gap-3 px-4 py-3 text-slate-500 hover:bg-slate-50 hover:text-primary rounded-xl font-medium transition-colors">
@@ -98,7 +98,7 @@
                             class="flex items-center gap-3 px-4 py-3 text-slate-500 hover:bg-slate-50 hover:text-primary rounded-xl font-medium transition-colors">
                             <span class="material-symbols-outlined">inventory_2</span> Kho hàng
                         </a>
-                        <a href="#"
+                        <a href="${pageContext.request.contextPath}/admin/orders"
                             class="flex items-center gap-3 px-4 py-3 text-slate-500 hover:bg-slate-50 hover:text-primary rounded-xl font-medium transition-colors">
                             <span class="material-symbols-outlined">receipt_long</span> Đơn hàng
                         </a>
@@ -190,7 +190,7 @@
                                     <span class="material-symbols-outlined text-primary">bar_chart</span> Thống kê doanh
                                     thu
                                 </h3>
-                                <select id="revenueMode"
+                                <select
                                     class="bg-slate-50 border-none rounded-xl text-sm font-medium focus:ring-2 focus:ring-primary/50 px-4 py-2">
                                     <option value="daily">Từng ngày</option>
                                     <option value="monthly">Từng tháng</option>
@@ -375,73 +375,50 @@
                 </main>
 
                 <script>
-                    const ctx = document.getElementById('revenueChart').getContext('2d');
+        const ctx = document.getElementById('revenueChart').getContext('2d');
 
-                    // Gradient xanh theo tone website
-                    let gradient = ctx.createLinearGradient(0, 0, 0, 400);
-                    gradient.addColorStop(0, 'rgba(76, 174, 79, 0.5)');
-                    gradient.addColorStop(1, 'rgba(76, 174, 79, 0.0)');
+                        // Tạo gradient màu xanh cho chart giống tone màu website
+                        let gradient = ctx.createLinearGradient(0, 0, 0, 400);
+                        gradient.addColorStop(0, 'rgba(76, 174, 79, 0.5)'); // primary color with opacity
+                        gradient.addColorStop(1, 'rgba(76, 174, 79, 0.0)');
 
-                    // Khởi tạo chart rỗng, data sẽ lấy từ API
-                    const revenueChart = new Chart(ctx, {
-                        type: 'line',
-                        data: {
-                            labels: [],
-                            datasets: [{
-                                label: 'Doanh thu (VNĐ)',
-                                data: [],
-                                borderColor: '#4cae4f',
-                                backgroundColor: gradient,
-                                borderWidth: 3,
-                                pointBackgroundColor: '#ffffff',
-                                pointBorderColor: '#4cae4f',
-                                pointBorderWidth: 2,
-                                pointRadius: 4,
-                                fill: true,
-                                tension: 0.4
-                            }]
-                        },
-                        options: {
-                            responsive: true,
-                            maintainAspectRatio: false,
-                            plugins: {
-                                legend: { display: false }
+                        new Chart(ctx, {
+                            type: 'line', // Chuyển thành dạng đường cho đẹp
+                            data: {
+                                labels: ['Thứ 2', 'Thứ 3', 'Thứ 4', 'Thứ 5', 'Thứ 6', 'Thứ 7', 'CN'], // Data ngày
+                                datasets: [{
+                                    label: 'Doanh thu (VNĐ)',
+                                    data: [1500000, 2300000, 1800000, 3200000, 2100000, 4500000, 5200000],
+                                    borderColor: '#4cae4f', // Màu primary
+                                    backgroundColor: gradient,
+                                    borderWidth: 3,
+                                    pointBackgroundColor: '#ffffff',
+                                    pointBorderColor: '#4cae4f',
+                                    pointBorderWidth: 2,
+                                    pointRadius: 4,
+                                    fill: true,
+                                    tension: 0.4 // Làm cong đường line
+                                }]
                             },
-                            scales: {
-                                y: {
-                                    beginAtZero: true,
-                                    grid: { borderDash: [5, 5], color: '#f1f5f9' },
-                                    border: { display: false }
+                            options: {
+                                responsive: true,
+                                maintainAspectRatio: false,
+                                plugins: {
+                                    legend: { display: false } // Giấu ghi chú cho gọn
                                 },
-                                x: {
-                                    grid: { display: false },
-                                    border: { display: false }
+                                scales: {
+                                    y: {
+                                        beginAtZero: true,
+                                        grid: { borderDash: [5, 5], color: '#f1f5f9' },
+                                        border: { display: false }
+                                    },
+                                    x: {
+                                        grid: { display: false },
+                                        border: { display: false }
+                                    }
                                 }
                             }
-                        }
-                    });
-
-                    async function loadRevenue(mode) {
-                        try {
-                            const res = await fetch('api/revenue?mode=' + encodeURIComponent(mode));
-                            const data = await res.json();
-
-                            const labels = data.map(x => x.dateLabel);
-                            const values = data.map(x => x.totalRevenue);
-
-                            revenueChart.data.labels = labels;
-                            revenueChart.data.datasets[0].data = values;
-                            revenueChart.update();
-                        } catch (e) {
-                            console.error('Load revenue failed', e);
-                        }
-                    }
-
-                    const modeSelect = document.getElementById('revenueMode');
-                    modeSelect.addEventListener('change', () => loadRevenue(modeSelect.value));
-
-                    // Load mặc định: theo ngày
-                    loadRevenue(modeSelect.value || 'daily');
+                        });
                 </script>
             </body>
 
