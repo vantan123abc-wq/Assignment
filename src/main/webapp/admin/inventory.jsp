@@ -104,7 +104,7 @@
                                 <span class="text-sm font-bold">Kho hàng</span>
                             </a>
                             <a class="flex items-center gap-3 px-3 py-3 text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800 rounded-lg transition-colors"
-                                href="#">
+                                href="${pageContext.request.contextPath}/admin/orders">
                                 <span class="material-symbols-outlined">shopping_cart</span>
                                 <span class="text-sm font-medium">Đơn hàng</span>
                             </a>
