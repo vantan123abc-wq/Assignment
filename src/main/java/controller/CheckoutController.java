@@ -32,13 +32,13 @@ public class CheckoutController extends HttpServlet {
             return;
         }
         String action = request.getParameter("action");
-if ("success".equals(action)) {
-    String orderId = request.getParameter("orderId");
-    request.setAttribute("orderId", orderId);
+        if ("success".equals(action)) {
+            String orderId = request.getParameter("orderId");
+            request.setAttribute("orderId", orderId);
 
-    request.getRequestDispatcher("order-success.jsp").forward(request, response);
-    return;
-}
+            request.getRequestDispatcher("order-success.jsp").forward(request, response);
+            return;
+        }
 
         CartDao cartDao = new CartDao();
         model.Cart cart = cartDao.getCartByAccountId(account.getId());
@@ -129,16 +129,19 @@ if ("success".equals(action)) {
             boolean success = orderDao.createOrder(order, cartItems, payment);
 
             if (success) {
-    cartDao.clearCart(account.getId());
+                cartDao.clearCart(account.getId());
 
-    // ĐỔI redirect về servlet (không redirect .jsp nữa)
-    response.sendRedirect(request.getContextPath() + "/checkout?action=success&orderId=" + order.getId());
-    return;
-} else {
-    request.setAttribute("error", "Đặt hàng thất bại! Vui lòng thử lại.");
-    doGet(request, response);
-    return;
-}
+                // Thêm thông báo chuông cho user
+                utils.NotificationHelper.orderPlaced(session, order.getId(), request.getContextPath());
+
+                // ĐỔI redirect về servlet (không redirect .jsp nữa)
+                response.sendRedirect(request.getContextPath() + "/checkout?action=success&orderId=" + order.getId());
+                return;
+            } else {
+                request.setAttribute("error", "Đặt hàng thất bại! Vui lòng thử lại.");
+                doGet(request, response);
+                return;
+            }
         }
     }
 }
