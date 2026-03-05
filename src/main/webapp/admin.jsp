@@ -40,7 +40,8 @@
                                 }
                             }
                         }
-
+                    }
+                    }
                 </script>
 
                 <style>
@@ -86,9 +87,9 @@
                     </div>
 
                     <nav class="flex-1 overflow-y-auto py-6 px-4 space-y-2">
-                        <a href="${pageContext.request.contextPath}/admin"
+                        <a href="#"
                             class="flex items-center gap-3 px-4 py-3 bg-primary/10 text-primary rounded-xl font-semibold transition-colors">
-                            <span class="material-symbols-outlined">dashboard</span> Tổng quan 
+                            <span class="material-symbols-outlined">dashboard</span> Tổng quan (Chart)
                         </a>
                         <a href="${pageContext.request.contextPath}/admin/users"
                             class="flex items-center gap-3 px-4 py-3 text-slate-500 hover:bg-slate-50 hover:text-primary rounded-xl font-medium transition-colors">
@@ -202,12 +203,18 @@
                             </div>
                         </section>
 
-                        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 items-stretch">
 
-                            <section class="bg-white border border-slate-100 rounded-2xl p-6 shadow-sm overflow-hidden">
-                                <div class="flex items-center justify-between mb-6">
-                                    <h3 class="text-xl font-bold">Người dùng hệ thống</h3>
-                                </div>
+    <section class="bg-white border border-slate-100 rounded-2xl p-6 shadow-sm flex flex-col h-full overflow-hidden">
+        <div class="flex flex-row items-center justify-between mb-6 shrink-0">
+            <h3 class="text-xl font-bold flex items-center gap-3">
+                Người dùng hệ thống
+                <span class="inline-flex items-center gap-1.5 bg-green-50 text-green-600 px-3 py-1 rounded-full text-sm font-bold border border-green-200">
+                    <span class="size-2.5 rounded-full bg-green-500 animate-pulse"></span>
+                    Đang Online: <span id="live-user-count">${activeUserCount != null ? activeUserCount : 0}</span>
+                </span>
+            </h3>
+        </div></h3>
                                 <div class="overflow-x-auto">
                                     <table class="w-full text-sm text-left">
                                         <thead
@@ -249,9 +256,9 @@
                                 </div>
                             </section>
 
-                            <section class="bg-white border border-slate-100 rounded-2xl p-6 shadow-sm overflow-hidden">
-                                <div class="flex items-center justify-between mb-6">
-                                    <h3 class="text-xl font-bold">Đơn hàng mới nhất</h3>
+                            <section class="h-full flex flex-col bg-white border border-slate-100 rounded-2xl p-6 shadow-sm overflow-hidden">
+    <div class="flex items-center justify-between mb-6">
+        <h3 class="text-xl font-bold">Đơn hàng mới nhất</h3>
                                     <a href="#" class="text-sm font-semibold text-primary hover:underline">Xem tất
                                         cả</a>
                                 </div>
@@ -375,51 +382,82 @@
                 </main>
 
                 <script>
-        const ctx = document.getElementById('revenueChart').getContext('2d');
+                    const ctx = document.getElementById('revenueChart').getContext('2d');
 
-                        // Tạo gradient màu xanh cho chart giống tone màu website
-                        let gradient = ctx.createLinearGradient(0, 0, 0, 400);
-                        gradient.addColorStop(0, 'rgba(76, 174, 79, 0.5)'); // primary color with opacity
-                        gradient.addColorStop(1, 'rgba(76, 174, 79, 0.0)');
+                    // Tạo gradient màu xanh cho chart giống tone màu website
+                    let gradient = ctx.createLinearGradient(0, 0, 0, 400);
+                    gradient.addColorStop(0, 'rgba(76, 174, 79, 0.5)'); // primary color with opacity
+                    gradient.addColorStop(1, 'rgba(76, 174, 79, 0.0)');
 
-                        new Chart(ctx, {
-                            type: 'line', // Chuyển thành dạng đường cho đẹp
-                            data: {
-                                labels: ['Thứ 2', 'Thứ 3', 'Thứ 4', 'Thứ 5', 'Thứ 6', 'Thứ 7', 'CN'], // Data ngày
-                                datasets: [{
-                                    label: 'Doanh thu (VNĐ)',
-                                    data: [1500000, 2300000, 1800000, 3200000, 2100000, 4500000, 5200000],
-                                    borderColor: '#4cae4f', // Màu primary
-                                    backgroundColor: gradient,
-                                    borderWidth: 3,
-                                    pointBackgroundColor: '#ffffff',
-                                    pointBorderColor: '#4cae4f',
-                                    pointBorderWidth: 2,
-                                    pointRadius: 4,
-                                    fill: true,
-                                    tension: 0.4 // Làm cong đường line
-                                }]
+                    new Chart(ctx, {
+                        type: 'line', // Chuyển thành dạng đường cho đẹp
+                        data: {
+                            labels: ['Thứ 2', 'Thứ 3', 'Thứ 4', 'Thứ 5', 'Thứ 6', 'Thứ 7', 'CN'], // Data ngày
+                            datasets: [{
+                                label: 'Doanh thu (VNĐ)',
+                                data: [1500000, 2300000, 1800000, 3200000, 2100000, 4500000, 5200000],
+                                borderColor: '#4cae4f', // Màu primary
+                                backgroundColor: gradient,
+                                borderWidth: 3,
+                                pointBackgroundColor: '#ffffff',
+                                pointBorderColor: '#4cae4f',
+                                pointBorderWidth: 2,
+                                pointRadius: 4,
+                                fill: true,
+                                tension: 0.4 // Làm cong đường line
+                            }]
+                        },
+                        options: {
+                            responsive: true,
+                            maintainAspectRatio: false,
+                            plugins: {
+                                legend: { display: false } // Giấu ghi chú cho gọn
                             },
-                            options: {
-                                responsive: true,
-                                maintainAspectRatio: false,
-                                plugins: {
-                                    legend: { display: false } // Giấu ghi chú cho gọn
+                            scales: {
+                                y: {
+                                    beginAtZero: true,
+                                    grid: { borderDash: [5, 5], color: '#f1f5f9' },
+                                    border: { display: false }
                                 },
-                                scales: {
-                                    y: {
-                                        beginAtZero: true,
-                                        grid: { borderDash: [5, 5], color: '#f1f5f9' },
-                                        border: { display: false }
-                                    },
-                                    x: {
-                                        grid: { display: false },
-                                        border: { display: false }
-                                    }
+                                x: {
+                                    grid: { display: false },
+                                    border: { display: false }
                                 }
                             }
-                        });
+                        }
+                    });
+                    // ====== CODE CẬP NHẬT REAL-TIME SỐ NGƯỜI ONLINE ======
+
+// Hàm gọi API lấy dữ liệu
+function fetchActiveUsers() {
+    // Gọi ngầm xuống API Servlet vừa tạo ở Bước 1
+    fetch('${pageContext.request.contextPath}/api/active-users')
+        .then(response => response.json()) // Chuyển kết quả về dạng JSON
+        .then(data => {
+            // Tìm ô hiển thị số và cập nhật con số mới nhất
+            const liveUserCountElement = document.getElementById('live-user-count');
+            if (liveUserCountElement) {
+                // Thêm hiệu ứng mờ nhạt (fade) nhẹ khi số thay đổi cho mượt mắt
+                if (liveUserCountElement.innerText !== data.count) {
+                    liveUserCountElement.style.opacity = 0;
+                    setTimeout(() => {
+                        liveUserCountElement.innerText = data.count;
+                        liveUserCountElement.style.opacity = 1;
+                    }, 200);
+                }
+            }
+        })
+        .catch(error => console.error('Lỗi khi lấy dữ liệu realtime:', error));
+}
+
+// Thêm chút CSS transition trực tiếp bằng JS cho mượt
+document.getElementById('live-user-count').style.transition = "opacity 0.2s ease-in-out";
+
+// Gọi hàm này lặp lại mỗi 5 giây (5000 mili-giây)
+setInterval(fetchActiveUsers, 5000);
                 </script>
+         
+
             </body>
 
             </html>
