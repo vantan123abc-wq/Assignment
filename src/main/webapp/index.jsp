@@ -76,7 +76,7 @@
                                     href="${pageContext.request.contextPath}/shop">Sản phẩm</a>
                                 <a class="font-medium hover:text-primary transition-colors"
                                     href="${pageContext.request.contextPath}/promotions">Khuyến mãi</a>
-                                <a class="font-medium hover:text-primary transition-colors" href="#">Về chúng tôi</a>
+                                <a class="font-medium hover:text-primary transition-colors" href="${pageContext.request.contextPath}/about">Về chúng tôi</a>
                             </nav>
 
                             <!-- Search & Actions -->
