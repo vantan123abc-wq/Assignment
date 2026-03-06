@@ -1,8 +1,6 @@
 package model;
 
 import java.sql.Timestamp;
-import java.util.Date;
-import java.util.List;
 
 public class Order {
     private int id;
@@ -10,6 +8,7 @@ public class Order {
     private int addressId;
     private double totalAmount;
     private String status;
+    private String returnReason;
     private Timestamp createdAt;
 
     public Order() {
@@ -65,6 +64,14 @@ public class Order {
         this.status = status;
     }
 
+    public String getReturnReason() {
+        return returnReason;
+    }
+
+    public void setReturnReason(String returnReason) {
+        this.returnReason = returnReason;
+    }
+
     public Timestamp getCreatedAt() {
         return createdAt;
     }
@@ -72,39 +79,4 @@ public class Order {
     public void setCreatedAt(Timestamp createdAt) {
         this.createdAt = createdAt;
     }
-
-    public String getCustomerEmail() {
-        return customerEmail;
-    }
-
-    public String getCustomerPhone() {
-        return customerPhone;
-    }
-
-    public Date getOrderDate() {
-        return orderDate;
-    }
-
-    public void setCustomerEmail(String customerEmail) {
-        this.customerEmail = customerEmail;
-    }
-
-    public void setCustomerPhone(String customerPhone) {
-        this.customerPhone = customerPhone;
-    }
-
-    public void setOrderDate(Date orderDate) {
-        this.orderDate = orderDate;
-    }
-   
-private String customerEmail;
-private String customerPhone;
-private java.util.Date orderDate;
-private List<CartItem> items;
-public List<CartItem> getItems() {
-    return items;
-}
-public void setItems(List<CartItem> items) {
-    this.items = items;
-}
 }
