@@ -104,8 +104,7 @@
                                             <span class="material-symbols-outlined">favorite</span>
                                         </button>
 
-                                        <%-- Notification Bell Widget (User only) --%>
-                                            <jsp:include page="WEB-INF/views/notification-bell.jsp" />
+                                        
 
                                             <a href="${pageContext.request.contextPath}/cart"
                                                 class="relative z-50 p-2.5 flex items-center justify-center rounded-full hover:bg-primary/10 text-slate-600 dark:text-slate-300">
